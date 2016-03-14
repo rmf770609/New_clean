@@ -53,4 +53,30 @@
         android:layout_toRightOf="@+id/button"
         android:layout_toEndOf="@+id/button"
         android:textAllCaps="false" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinner"
+        android:layout_below="@+id/hide_checkBox"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <ListView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/listView"
+        android:layout_below="@+id/spinner"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Clean"
+        android:id="@+id/btnClean"
+        android:layout_below="@+id/editText"
+        android:layout_toRightOf="@+id/button_restore"
+        android:layout_toEndOf="@+id/button_restore"
+        android:textAllCaps="false" />
 </RelativeLayout>
