@@ -1,9 +1,13 @@
 package com.example.raymond.simpleui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
+import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -18,6 +22,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
+
+    /* Define requestCode for Intent */
+    private static final int REQUEST_CODE_MENU_ACTIVITY = 0;
 
     /* Declare variables */
     TextView textView;
@@ -136,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
     {
         public void onClick(View v)
         {
-            editText.setText(sp.getString("editText" , ""));
+            editText.setText(sp.getString("editText", ""));
             //editText.setText("RESTORE");
         }
     };
@@ -151,4 +158,65 @@ public class MainActivity extends AppCompatActivity {
             setListView();
         }
     };
+
+    /* Debug message for LifeCycle */
+    @Override
+    public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
+        super.onCreate(savedInstanceState, persistentState);
+        Log.d("debug", "Main activity onCreate");
+    }
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.d("debug", "Main activity onRestart");
+    }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d("debug", "Main activity onStart");
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d("debug", "Main activity onResume");
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d("debug", "Main activity onPause");
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d("debug", "Main activity onStop");
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d("debug", "Main activity onDestroy");
+    }
+
+    /* Intent to DrinkMenuActivity */
+    public void goToMenu(View view)
+    {
+        Intent intent = new Intent();
+        intent.setClass(this, DrinkMenuActivity.class);
+        startActivityForResult(intent, REQUEST_CODE_MENU_ACTIVITY); // Safer than startActivity(intent);
+    }
+    /* Debug & confirm message for receiving data from DrinkMenuActivity */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d("debug", "Main activity onActivityResult");
+
+        if (requestCode == REQUEST_CODE_MENU_ACTIVITY)
+        {
+            if (resultCode == RESULT_OK)
+            {
+                Log.d("debug", "Main order done");
+                textView.setText(data.getStringExtra("result"));
+            }
+        }
+
+    }
 }

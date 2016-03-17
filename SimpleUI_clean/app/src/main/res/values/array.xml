@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="storeInfo">
-        <item> A </item> //could put name here
-        <item> B </item>
-        <item> C </item>
-        <item> D </item>
-        <item> E </item>
+        <item> 台大店 </item> //could put name here
+        <item> 士林店 </item>
+        <item> 南京店 </item>
+        <item> 松江店 </item>
+        <item> 信義店 </item>
     </string-array>
 </resources>
