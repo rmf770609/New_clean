@@ -21,6 +21,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class MainActivity extends AppCompatActivity {
 
     /* Define requestCode for Intent */
@@ -36,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     SharedPreferences.Editor editor;
     ListView listView;
     Spinner spinner;
+    String menuResult="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -214,7 +219,32 @@ public class MainActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK)
             {
                 Log.d("debug", "Main order done");
-                textView.setText(data.getStringExtra("result"));
+
+                menuResult = data.getStringExtra("result");
+
+                try
+                {
+                    JSONArray array = new JSONArray(menuResult);
+                    String text="";
+
+                    for(int i=0; i<array.length(); i++)
+                    {
+                        JSONObject order = array.getJSONObject(i);
+
+                        String name = order.getString("name");
+                        String lNumber = order.getString("lNumber");
+                        String mNumber = order.getString("mNumber");
+
+                        text = text + name + " L: " + lNumber + " M: " + mNumber + "\n";
+                    }
+                    textView.setText(text);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+//                //Just get text: "Order Done!" from DrinkMenuActivity
+//                textView.setText(data.getStringExtra("result"));
             }
         }
 
