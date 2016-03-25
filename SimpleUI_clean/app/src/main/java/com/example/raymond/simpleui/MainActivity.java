@@ -17,13 +17,24 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -41,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     ListView listView;
     Spinner spinner;
     String menuResult="";
+    private List<ParseObject> queryResult;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,9 +118,71 @@ public class MainActivity extends AppCompatActivity {
     /* Set listView */
     private void setListView()
     {
-        String[] data = Utils.readFile(this, "history.txt").split("\n"); //.split() NEED to check further
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, data);
-        listView.setAdapter(adapter);
+        //ParseQuery form parse server
+        ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Order");
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                if (e != null)
+                {
+                    Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                queryResult = objects;
+
+                List<Map<String, String>> data = new ArrayList<Map<String, String>>();
+
+                for (int i=0; i<queryResult.size(); i++)
+                {
+                    ParseObject object = queryResult.get(i);
+                    String note = object.getString("note");
+                    String storeInfo = object.getString("storeInfo");
+                    String menu = object.getString("menu");
+
+                    Map<String, String> item = new HashMap<String, String>();
+
+                    item.put("note", note);
+                    item.put("storeInfo", storeInfo);
+                    item.put("drinkNum", getDrinkNumber(menu));
+
+                    data.add(item);
+                }
+
+                String[] from = {"note", "storeInfo", "drinkNum"};
+                int[] to = {R.id.note, R.id.storeInfo, R.id.drinkNum};
+
+                SimpleAdapter adapter = new SimpleAdapter(MainActivity.this, data, R.layout.listitem_item, from, to);
+
+                listView.setAdapter(adapter);
+
+            }
+        });
+
+//        // Show local history list from history.txt
+//        String[] data = Utils.readFile(this, "history.txt").split("\n"); //.split() NEED to check further
+//        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, data);
+//        listView.setAdapter(adapter);
+    }
+
+    /* Count total amount from order menu */
+    private String getDrinkNumber(String menu) {
+        String menuNumber = "";
+        int totalNumber = 0;
+
+        try{
+            JSONArray menuArray = new JSONArray(menu);
+
+            for(int i=0; i<menuArray.length(); i++)
+            {
+                JSONObject order = menuArray.getJSONObject(i);
+                totalNumber += order.getInt("lNumber") + order.getInt("mNumber");
+                menuNumber = String.valueOf(totalNumber);
+            }
+        } catch (JSONException e1) {
+            e1.printStackTrace();
+        }
+        return menuNumber;
     }
 
     /* Set Spinner */
@@ -220,6 +294,7 @@ public class MainActivity extends AppCompatActivity {
             {
                 Log.d("debug", "Main order done");
 
+                //Get order menu from DrinkMenuActivity
                 menuResult = data.getStringExtra("result");
 
                 try
@@ -241,8 +316,6 @@ public class MainActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
-
 //                //Just get text: "Order Done!" from DrinkMenuActivity
 //                textView.setText(data.getStringExtra("result"));
             }
