@@ -3,7 +3,6 @@ package com.example.raymond.simpleui;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,12 +10,14 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -52,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
     ListView listView;
     Spinner spinner;
     String menuResult="";
+    ProgressBar progressBar;
     private List<ParseObject> queryResult;
 
     @Override
@@ -65,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
         hidecheckBox = (CheckBox)findViewById(R.id.hide_checkBox);
         listView = (ListView)findViewById(R.id.listView);
         spinner = (Spinner)findViewById(R.id.spinner);
+        progressBar = (ProgressBar)findViewById(R.id.progressBar);
 
         /* Setup button_restore & related triggered event */
         button_restore = (Button)findViewById(R.id.button_restore);
@@ -81,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
         hidecheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                editor.putBoolean("hideCheckBox" , hidecheckBox.isChecked());
+                editor.putBoolean("hideCheckBox", hidecheckBox.isChecked());
                 editor.commit();
             }
         });
@@ -90,8 +93,7 @@ public class MainActivity extends AppCompatActivity {
         editText.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)
-                {
+                if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
                     submit(v);
                     return true;
                 }
@@ -111,6 +113,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        listView.setVisibility(View.GONE);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                goToDetailOrder(position);
+            }
+        });
+
         setListView();
         setSpinner();
     }
@@ -126,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
                 if (e != null)
                 {
                     Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                    progressBar.setVisibility(View.GONE);
                     return;
                 }
 
@@ -150,12 +161,14 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 String[] from = {"note", "storeInfo", "drinkNum"};
-                int[] to = {R.id.note, R.id.storeInfo, R.id.drinkNum};
+                int[] to = {R.id.noteView, R.id.storeInfoView, R.id.drinkNum};
 
                 SimpleAdapter adapter = new SimpleAdapter(MainActivity.this, data, R.layout.listitem_item, from, to);
 
                 listView.setAdapter(adapter);
 
+                progressBar.setVisibility(View.GONE);
+                listView.setVisibility(View.VISIBLE);
             }
         });
 
@@ -322,4 +335,23 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
+    public void goToDetailOrder(int position)
+    {
+        ParseObject object = queryResult.get(position);
+
+        Intent intent = new Intent();
+        intent.setClass(this, OrderDetailActivity.class);
+
+        intent.putExtra("note", object.getString("note"));
+        intent.putExtra("storeInfo", object.getString("storeInfo"));
+        intent.putExtra("menu", object.getString("menu"));
+
+        if (object.getParseFile("photo") != null)
+        {
+            intent.putExtra("photoURL", object.getParseFile("photo").getUrl());
+        }
+        startActivity(intent);
+    }
+
 }

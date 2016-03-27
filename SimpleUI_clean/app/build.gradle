@@ -27,4 +27,8 @@ dependencies {
     /* Gradle for parse server */
     compile 'com.parse.bolts:bolts-android:1.+'
     compile 'com.parse:parse-android:1.+'
+
+    /* Picasso */
+    compile 'com.squareup.picasso:picasso:2.5.2'
+
 }

@@ -6,7 +6,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Note"
-        android:id="@+id/note"
+        android:id="@+id/noteView"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
@@ -15,8 +15,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="StoreInfo"
-        android:id="@+id/storeInfo"
-        android:layout_below="@+id/note"
+        android:id="@+id/storeInfoView"
+        android:layout_below="@+id/noteView"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
