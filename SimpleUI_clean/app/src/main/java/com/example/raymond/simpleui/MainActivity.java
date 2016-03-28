@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.PersistableBundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
@@ -30,6 +31,7 @@ import android.widget.Toast;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.SaveCallback;
@@ -266,6 +268,13 @@ public class MainActivity extends AppCompatActivity {
         orderObject.put("storeInfo", spinner.getSelectedItem());
         orderObject.put("menu", menuResult);
 
+        if (hasPhoto)
+        {
+            Uri uri = Utils.getPhotoUri();
+            ParseFile file = new ParseFile("photo.png", Utils.uriToBytes(this, uri));
+            orderObject.put("photo", file);
+        }
+
         progressDialog.setTitle("Loading...");
         progressDialog.show();
 
@@ -284,6 +293,10 @@ public class MainActivity extends AppCompatActivity {
                     textView.setText("");
                     editText.setText("");
                     setListView();
+                }
+                else
+                {
+                    Toast.makeText(MainActivity.this, "Submit FAIL", Toast.LENGTH_LONG);
                 }
 
             }
