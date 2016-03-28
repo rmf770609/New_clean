@@ -107,12 +107,12 @@
     </LinearLayout>
 
     <ListView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/listView"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/Option" />
+        android:layout_below="@+id/imageView" />
 
     <ProgressBar
         android:layout_width="wrap_content"
@@ -120,5 +120,12 @@
         android:id="@+id/progressBar"
         android:layout_below="@+id/Option"
         android:layout_centerHorizontal="true" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/Option" />
 
 </RelativeLayout>

@@ -5,10 +5,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.PersistableBundle;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
@@ -17,6 +20,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SimpleAdapter;
@@ -43,6 +47,9 @@ public class MainActivity extends AppCompatActivity {
 
     /* Define requestCode for Intent */
     private static final int REQUEST_CODE_MENU_ACTIVITY = 0;
+    private static final int REQUEST_CODE_CAMERA = 1;
+
+    private Boolean hasPhoto = false;
 
     /* Declare variables */
     TextView textView;
@@ -55,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
     ListView listView;
     Spinner spinner;
     String menuResult="";
+    ImageView photoView;
     ProgressDialog progressDialog;
     ProgressBar progressBar;
     private List<ParseObject> queryResult;
@@ -70,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
         hidecheckBox = (CheckBox)findViewById(R.id.hide_checkBox);
         listView = (ListView)findViewById(R.id.listView);
         spinner = (Spinner)findViewById(R.id.spinner);
+        photoView = (ImageView)findViewById(R.id.imageView);
         progressDialog = new ProgressDialog(this);
         progressBar = (ProgressBar)findViewById(R.id.progressBar);
 
@@ -83,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
         /* Setup Shared Preference */
         sp = getSharedPreferences("setting", Context.MODE_PRIVATE);
         editor = sp.edit();
+
         /* Record checkbox status */
         hidecheckBox.setChecked(sp.getBoolean("hideCheckBox" , false));
         hidecheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -90,6 +100,15 @@ public class MainActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 editor.putBoolean("hideCheckBox", hidecheckBox.isChecked());
                 editor.commit();
+
+                if (isChecked)
+                {
+                    photoView.setVisibility(View.GONE);
+                }
+                else
+                {
+                    photoView.setVisibility(View.VISIBLE);
+                }
             }
         });
 
@@ -260,6 +279,8 @@ public class MainActivity extends AppCompatActivity {
                 {
                     Toast.makeText(MainActivity.this, "Submit OK", Toast.LENGTH_LONG);
 
+                    hasPhoto = false;
+                    photoView.setImageResource(0);
                     textView.setText("");
                     editText.setText("");
                     setListView();
@@ -398,7 +419,44 @@ public class MainActivity extends AppCompatActivity {
 //                textView.setText(data.getStringExtra("result"));
             }
         }
+        else if (requestCode == REQUEST_CODE_CAMERA)
+        {
+            Log.d("debug", "REQUEST_CODE_CAMERA");
+            if (resultCode == RESULT_OK)
+            {
+                Log.d("debug", "CAMERA_RESULT_OK");
+                photoView.setImageURI(Utils.getPhotoUri());
+                hasPhoto = true;
+            }
+        }
 
+    }
+
+    /* Option list for Take Photo */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_take_photo)
+        {
+            Toast.makeText(this, "Take Photo", Toast.LENGTH_LONG).show();
+            goToCamera();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void goToCamera()
+    {
+        Intent intent = new Intent();
+        intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, Utils.getPhotoUri());
+        startActivityForResult(intent, REQUEST_CODE_CAMERA);
     }
 
     public void goToDetailOrder(int position)

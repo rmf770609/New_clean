@@ -1,11 +1,15 @@
 package com.example.raymond.simpleui;
 
 import android.content.Context;
+import android.net.Uri;
+import android.os.Environment;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URI;
 
 /**
  * Created by raymond on 3/13/16.
@@ -55,6 +59,19 @@ public class Utils {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /* For camera  */
+    public static Uri getPhotoUri()
+    {
+        File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        if (dir.exists() == false)
+        {
+            dir.mkdir();
+        }
+
+        File file = new File(dir, "simple_photo.png");
+        return Uri.fromFile(file);
     }
 
 }
