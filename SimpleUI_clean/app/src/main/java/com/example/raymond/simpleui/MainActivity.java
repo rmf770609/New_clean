@@ -1,5 +1,6 @@
 package com.example.raymond.simpleui;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -27,6 +28,7 @@ import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.SaveCallback;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -53,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     ListView listView;
     Spinner spinner;
     String menuResult="";
+    ProgressDialog progressDialog;
     ProgressBar progressBar;
     private List<ParseObject> queryResult;
 
@@ -67,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
         hidecheckBox = (CheckBox)findViewById(R.id.hide_checkBox);
         listView = (ListView)findViewById(R.id.listView);
         spinner = (Spinner)findViewById(R.id.spinner);
+        progressDialog = new ProgressDialog(this);
         progressBar = (ProgressBar)findViewById(R.id.progressBar);
 
         /* Setup button_restore & related triggered event */
@@ -235,16 +239,45 @@ public class MainActivity extends AppCompatActivity {
     {
         String text = editText.getText().toString(); //get string from edit text
         Utils.writeFile(this, "history.txt", text + '\n');
-        if (hidecheckBox.isChecked())
-        {
-            Toast.makeText(this, text, Toast.LENGTH_LONG).show();
-            textView.setText("**********");
-            editText.setText("**********");
-        }
-        else
-        {
-            textView.setText(text);
-        }
+
+        /* Submit data to Parse server */
+        ParseObject orderObject = new ParseObject("Order");
+
+        orderObject.put("note", text);
+        orderObject.put("storeInfo", spinner.getSelectedItem());
+        orderObject.put("menu", menuResult);
+
+        progressDialog.setTitle("Loading...");
+        progressDialog.show();
+
+        orderObject.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+
+                progressDialog.dismiss();
+
+                if (e == null)
+                {
+                    Toast.makeText(MainActivity.this, "Submit OK", Toast.LENGTH_LONG);
+
+                    textView.setText("");
+                    editText.setText("");
+                    setListView();
+                }
+
+            }
+        });
+
+//        if (hidecheckBox.isChecked())
+//        {
+//            Toast.makeText(this, text, Toast.LENGTH_LONG).show();
+//            textView.setText("**********");
+//            editText.setText("**********");
+//        }
+//        else
+//        {
+//            textView.setText(text);
+//        }
         /* Show in listview */
         setListView();
         /* Put into SP */
@@ -252,6 +285,8 @@ public class MainActivity extends AppCompatActivity {
         editor.apply();
         /* Clean editText */
         editText.setText("");
+        /* Refresh textView */
+        textView.setText(text);
     }
 
     /* onClick event @button_restore */
@@ -260,6 +295,7 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View v)
         {
             editText.setText(sp.getString("editText", ""));
+            textView.setText(sp.getString("order", ""));
             //editText.setText("RESTORE");
         }
     };
@@ -271,6 +307,8 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View v) {
             Utils.cleanFile(MainActivity.this, "history.txt", "");
             Toast.makeText(MainActivity.this, "Clean", Toast.LENGTH_LONG).show(); //WHY cannot this
+            textView.setText("");
+            editText.setText("");
             setListView();
         }
     };
@@ -350,6 +388,9 @@ public class MainActivity extends AppCompatActivity {
                         text = text + name + " L: " + lNumber + " M: " + mNumber + "\n";
                     }
                     textView.setText(text);
+                    /* Shared Preference can reload menu*/
+                    editor.putString("order", text);
+                    editor.apply();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
