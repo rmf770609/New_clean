@@ -201,9 +201,33 @@ public class MainActivity extends AppCompatActivity {
     /* Set Spinner */
     private void setSpinner()
     {
-        String[] data = getResources().getStringArray(R.array.storeInfo);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, data);
-        spinner.setAdapter(adapter);
+        /* Get storeInfo from Parse server  */
+        ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("StoreInfo");
+
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                if (e != null)
+                {
+                    Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                String[] stores = new String[objects.size()];
+                for (int i=0; i<objects.size(); i++)
+                {
+                    ParseObject object = objects.get(i);
+                    stores[i] = object.getString("name") + ", " + object.getString("address");
+                }
+
+                ArrayAdapter<String> storeAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_item, stores);
+                spinner.setAdapter(storeAdapter);
+            }
+        });
+//        /* Get storeInfo from local array.xml */
+//        String[] data = getResources().getStringArray(R.array.storeInfo);
+//        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, data);
+//        spinner.setAdapter(adapter);
     }
 
     /* onClick event @button */
