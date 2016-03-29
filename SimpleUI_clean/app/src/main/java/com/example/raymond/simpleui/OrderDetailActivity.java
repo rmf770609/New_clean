@@ -1,8 +1,16 @@
 package com.example.raymond.simpleui;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.webkit.WebView;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -17,6 +25,11 @@ public class OrderDetailActivity extends AppCompatActivity {
     TextView storeInfo;
     TextView menu;
     ImageView photo;
+    ImageView staticMapImageView;
+    WebView webView;
+
+    Switch switchMapPic;
+    Switch switchMapWeb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +40,41 @@ public class OrderDetailActivity extends AppCompatActivity {
         storeInfo = (TextView)findViewById(R.id.storeInfoView);
         menu = (TextView)findViewById(R.id.menuView);
         photo = (ImageView)findViewById(R.id.photoView);
+        staticMapImageView = (ImageView)findViewById(R.id.staticMapImageView);
+        webView = (WebView)findViewById(R.id.webView);
+
+        /* For switch */
+        switchMapPic = (Switch)findViewById(R.id.switchMapPic);
+        switchMapWeb = (Switch)findViewById(R.id.switchMapWeb);
+
+        switchMapPic.setChecked(false);
+        switchMapPic.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    staticMapImageView.setVisibility(View.VISIBLE);
+                } else {
+                    staticMapImageView.setVisibility(View.GONE);
+                }
+            }
+        });
+        switchMapWeb.setChecked(false);
+        switchMapWeb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked)
+                {
+                    webView.setVisibility(View.VISIBLE);
+                }
+                else
+                {
+                    webView.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        /* For GeoCoding */
+        String storeInformation = getIntent().getStringExtra("storeInfo");
 
         note.setText(getIntent().getStringExtra("note"));
         storeInfo.setText(getIntent().getStringExtra("storeInfo"));
@@ -52,11 +100,50 @@ public class OrderDetailActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        /* For photo loading */
         String url = getIntent().getStringExtra("photoURL");
         if (url != null)
         {
             Picasso.with(this).load(url).into(photo);
         }
 
+        /* For GeoCoding */
+        String address = storeInformation.split(",")[1];
+        Log.d("debug", address);
+        new GeoCodingTask().execute(address);
+
     }
+
+    /* For GeoCoding */
+    class GeoCodingTask extends AsyncTask<String, Void, byte[]>
+    {
+        private double[] latlng;
+        private String url;
+
+        @Override
+        protected byte[] doInBackground(String... params) {
+
+            String address = params[0];
+            latlng = Utils.addressToLatLng(address);
+            url = Utils.getStaticMapUrl(latlng, 17);
+            return Utils.urlToBytes(url);
+            //return new byte[0];
+        }
+
+        @Override
+        protected void onPostExecute(byte[] bytes) {
+
+            webView.loadUrl(url);
+
+            Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+            staticMapImageView.setImageBitmap(bmp);
+            //super.onPostExecute(bytes);
+
+            /* For switch: default invisible */
+            if (switchMapPic.isChecked() != true){staticMapImageView.setVisibility(View.GONE);}
+            if (switchMapWeb.isChecked() != true){webView.setVisibility(View.GONE);}
+
+        }
+    }
+
 }
