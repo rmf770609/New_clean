@@ -172,7 +172,7 @@ public class OrderDetailActivity extends AppCompatActivity {
                     return false;
                 }
             });
-            
+
             /* For switch: default invisible */
             if (switchMapPic.isChecked() != true){staticMapImageView.setVisibility(View.GONE);}
             if (switchMapWeb.isChecked() != true){webView.setVisibility(View.GONE);}

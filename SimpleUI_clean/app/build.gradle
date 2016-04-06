@@ -33,4 +33,7 @@ dependencies {
 
     /* GoogleMap */
     compile 'com.google.android.gms:play-services:8.4.0'
+
+    /* FB API */
+    compile 'com.facebook.android:facebook-android-sdk:[4,5)'
 }

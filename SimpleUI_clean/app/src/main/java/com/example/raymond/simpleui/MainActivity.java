@@ -29,6 +29,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.appevents.AppEventsLogger;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -367,11 +368,20 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Log.d("debug", "Main activity onResume");
+
+        //FB API
+        // Logs 'install' and 'app activate' App Events.
+        AppEventsLogger.activateApp(this);
     }
+
     @Override
     protected void onPause() {
         super.onPause();
         Log.d("debug", "Main activity onPause");
+
+        // FB API
+        // Logs 'app deactivate' App Event.
+        AppEventsLogger.deactivateApp(this);
     }
     @Override
     protected void onStop() {
