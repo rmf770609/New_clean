@@ -34,6 +34,11 @@
             android:name="com.parse.CLIENT_KEY"
             android:value="DnZ3ggXI55eF8ypD5bps3eBYQ0qAFCHehre5Wu6a" />
 
+        /* GoogleMap API */
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyA4B4hwf6446YweblRrOSbwytNDphPI8u8" />
+
         <activity android:name=".OrderDetailActivity"></activity>
     </application>
 

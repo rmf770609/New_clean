@@ -31,4 +31,6 @@ dependencies {
     /* Picasso */
     compile 'com.squareup.picasso:picasso:2.5.2'
 
+    /* GoogleMap */
+    compile 'com.google.android.gms:play-services:8.4.0'
 }

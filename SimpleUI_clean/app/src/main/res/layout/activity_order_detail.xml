@@ -81,19 +81,24 @@
                 android:layout_alignParentRight="false">
 
                 <Switch
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:text="Map_Pic"
                     android:id="@+id/switchMapPic"
-                    android:checked="false" />
+                    android:checked="false"
+                    android:layout_weight="1"
+                    android:textSize="10dp" />
 
                 <Switch
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:text="Map_Web"
                     android:id="@+id/switchMapWeb"
                     android:layout_alignParentRight="true"
-                    android:checked="false" />
+                    android:checked="false"
+                    android:layout_weight="1"
+                    android:textSize="10dp" />
+
             </LinearLayout>
 
             <ImageView
@@ -112,6 +117,13 @@
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_below="@+id/staticMapImageView" />
+
+            <fragment
+                android:layout_width="match_parent"
+                android:layout_height="400dp"
+                android:name="com.google.android.gms.maps.MapFragment"
+                android:id="@+id/mapFragment"
+                android:layout_below="@+id/webView" />
         </RelativeLayout>
     </ScrollView>
 

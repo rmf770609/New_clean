@@ -12,7 +12,15 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -27,6 +35,8 @@ public class OrderDetailActivity extends AppCompatActivity {
     ImageView photo;
     ImageView staticMapImageView;
     WebView webView;
+    MapFragment mapFregment;
+    GoogleMap map;
 
     Switch switchMapPic;
     Switch switchMapWeb;
@@ -42,6 +52,13 @@ public class OrderDetailActivity extends AppCompatActivity {
         photo = (ImageView)findViewById(R.id.photoView);
         staticMapImageView = (ImageView)findViewById(R.id.staticMapImageView);
         webView = (WebView)findViewById(R.id.webView);
+        mapFregment = (MapFragment)getFragmentManager().findFragmentById(R.id.mapFragment);
+        mapFregment.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap googleMap) {
+                map = googleMap;
+            }
+        });
 
         /* For switch */
         switchMapPic = (Switch)findViewById(R.id.switchMapPic);
@@ -139,6 +156,23 @@ public class OrderDetailActivity extends AppCompatActivity {
             staticMapImageView.setImageBitmap(bmp);
             //super.onPostExecute(bytes);
 
+            /* Set Location @GoogleMap*/
+            LatLng location = new LatLng(latlng[0], latlng[1]);
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 17));
+
+            String[] storeInfos = getIntent().getStringExtra("storeInfo").split(",");
+            map.addMarker(new MarkerOptions()
+                    .title(storeInfos[0])
+                    .snippet(storeInfos[1])
+                    .position(location));
+            map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(Marker marker) {
+                    Toast.makeText(OrderDetailActivity.this, marker.getTitle(), Toast.LENGTH_LONG).show();
+                    return false;
+                }
+            });
+            
             /* For switch: default invisible */
             if (switchMapPic.isChecked() != true){staticMapImageView.setVisibility(View.GONE);}
             if (switchMapWeb.isChecked() != true){webView.setVisibility(View.GONE);}
